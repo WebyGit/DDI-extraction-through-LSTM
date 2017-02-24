@@ -48,11 +48,6 @@ class RNN_Relation(object):
 		h = tf.concat(2, [output_fw, output_bw])				# NxMx200
 		print 'h', h.get_shape()
 
-		# attention layer	
-		W_a1 = tf.get_variable("W_a1", shape=[2*num_filters, 2*num_filters])	# 200x200
-		tmp1 = tf.matmul(tf.reshape(h, shape=[-1, 2*num_filters]), W_a1, name="Wy") # NMx200
-		h = tf.reshape(tmp1, shape=[-1, sentMax, 2*num_filters])		# NxMx200
-
  		M = tf.tanh(h)								# NxMx200
 		W_a2 = tf.get_variable("W_a2", shape=[2*num_filters, 1]) 		# 200 x 1
 		print "W_a2", W_a2.get_shape()
@@ -79,7 +74,7 @@ class RNN_Relation(object):
 
 		self.predictions = tf.argmax(scores, 1, name="predictions")
 		losses = tf.nn.softmax_cross_entropy_with_logits(scores, self.input_y)
-		self.loss = tf.reduce_mean(losses) + l2_reg_lambda * (tf.nn.l2_loss(W) + tf.nn.l2_loss(b) + tf.nn.l2_loss(W_a1) +tf.nn.l2_loss(W_a2) )
+		self.loss = tf.reduce_mean(losses) + l2_reg_lambda * (tf.nn.l2_loss(W) + tf.nn.l2_loss(b) + tf.nn.l2_loss(W_a2) )
 
 		self.correct_predictions = tf.equal(self.predictions, tf.argmax(self.input_y, 1))
 		self.accuracy = tf.reduce_mean(tf.cast(self.correct_predictions, "float"), name="accuracy")
